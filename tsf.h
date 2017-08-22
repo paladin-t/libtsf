@@ -1166,11 +1166,11 @@ TSFDEF void tsf_close(tsf* f) {
 		TSF_FREE(*f->outputSamples);
 		TSF_FREE(f->outputSamples);
 		TSF_FREE(f->outputSampleSize);
-		if (f->player)
-			TSF_FREE(f->player);
 		TSF_FREE(f->refCount);
 	}
 	TSF_FREE(f->voices);
+	if (f->player)
+		TSF_FREE(f->player);
 	TSF_FREE(f);
 }
 
