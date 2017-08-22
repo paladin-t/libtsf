@@ -832,6 +832,7 @@ static void tsf_voice_kill(struct tsf_voice* v) {
 }
 
 static void tsf_voice_end(struct tsf_voice* v, float outSampleRate) {
+	if (!v || !v->region) return;
 	tsf_voice_envelope_nextsegment(&v->ampenv, TSF_SEGMENT_SUSTAIN, outSampleRate);
 	tsf_voice_envelope_nextsegment(&v->modenv, TSF_SEGMENT_SUSTAIN, outSampleRate);
 	if (v->region->loop_mode == TSF_LOOPMODE_SUSTAIN) {
@@ -1072,7 +1073,7 @@ TSFDEF tsf* tsf_load(struct tsf_stream* stream) {
 	struct tsf_riffchunk chunkList;
 	struct tsf_hydra hydra;
 	float* fontSamples = TSF_NULL;
-	int fontSampleCount;
+	int fontSampleCount = 0;
 
 	if (!tsf_riffchunk_read(TSF_NULL, &chunkHead, stream) || !TSF_FourCCEquals(chunkHead.id, "sfbk")) {
 		// if (e) *e = TSF_INVALID_NOSF2HEADER;
@@ -1388,7 +1389,7 @@ TSFDEF const char* tsf_play(tsf* f, int preset, const char* seq, float vel, void
 				break;
 			}
 		} else if (*seq == 'P' || *seq == 'p') {
-			float t = 0.0f, r = 0.0f;
+			float t = 0.0f;
 			float len = (float)f->player->length;
 			float dotted = 1.0f;
 
@@ -1447,7 +1448,7 @@ TSFDEF void tsf_play_async(tsf* f, int preset, const char* seq, float vel) {
 }
 
 TSFDEF const char* tsf_play_await(tsf* f, float delta) {
-	if (!f->player->asyncSeq) {
+	if (!f->player || !f->player->asyncSeq) {
 		return TSF_NULL;
 	}
 
