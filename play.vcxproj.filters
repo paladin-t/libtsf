@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="play.cpp" />
+    <ClCompile Include="examples\minisdl_audio.c">
+      <Filter>examples</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tsf.h" />
+    <ClInclude Include="examples\minisdl_audio.h">
+      <Filter>examples</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="examples">
+      <UniqueIdentifier>{af0ee0a2-6ef8-46e8-97db-f3a3d80a486c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
