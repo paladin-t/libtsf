@@ -37,7 +37,7 @@ const char* seq = "ML L3 AA8G8E.D8C2P2 E.D8C<A8G8G2>P2 <G.A8G.A8>C.D8EG A.G8E8D8
 tsf_play_async(ptsf, 0, seq, 0.2f);
 while (seq && *seq) {
 	seq = tsf_play_await(ptsf, 10.0f / 1000.0f);
-	delay(10);
+	sleep(10);
 }
 ```
 
@@ -45,11 +45,11 @@ while (seq && *seq) {
 
 The API documentation can be found on [top of the library source code](tsf.h).
 
-There are also [examples available](examples) which come with a sample SoundFont file and build and play sound on Win32, Win64, Linux and MacOSX with no further dependencies.
+There are also [examples available](examples) which come with a sample SoundFont file and build and play sound on Win32, Win64, Linux and macOS with no further dependencies.
 
 ## Documentation
 
-[SoundFont](docs/SoundFont%20Technical%20Specification.pdf)
+[SoundFont Technical Specification](docs/SoundFont%20Technical%20Specification.pdf)
 
 [Music Macro Language](https://en.wikipedia.org/wiki/Music_Macro_Language)
 
