@@ -1,5 +1,5 @@
 /*
-** libtfs - A simple SoundFont2 synthesizer.
+** libtfs - A software synthesizer using SoundFont2, and also a player of Music Macro Language.
 **
 ** (Copyright (C) 2017 Wang Renxin - https://github.com/paladin-t/libtsf
 **   (Based on TinySoundFont, Copyright (C) 2017 Bernhard Schelling - https://github.com/schellingb/TinySoundFont
@@ -20,7 +20,7 @@
 ** [OPTIONAL] #define TSF_POW, TSF_POWF, TSF_EXPF, TSF_LOG, TSF_TAN, TSF_LOG10, TSF_SQRT to avoid math.h
 **
 ** ENHANCEMENTS FROM BASE
-**   - Play music in QBASIC's sequence format
+**   - Play music in QBASIC's MML format
 **
 ** NOT YET IMPLEMENTED
 **   - Lower level voice interface to render single voices/presets
@@ -149,7 +149,7 @@ TSFDEF void tsf_note_off(tsf* f, int preset, int key);
 //   vel: velocity as a float between 0.0 (equal to note off) and 1.0 (full)
 //   delay: you should provide a function which delays/sleeps for certain milliseconds
 // Returns the end ('\0') of a sequence if succeed, or the location where an
-// error occurred.
+//   error occurred.
 TSFDEF const char* tsf_play(tsf* f, int preset, const char* seq, float vel, void (* delay)(unsigned int));
 
 // Play music in QBASIC's MML format. Runs asynchronously.
@@ -683,7 +683,7 @@ static void tsf_load_samples(float** fontSamples, int* fontSampleCount, struct t
 	float* out; unsigned int samplesLeft, samplesToRead, samplesToConvert;
 	samplesLeft = *fontSampleCount = chunkSmpl->size / sizeof(short);
 	out = *fontSamples = (float*)TSF_MALLOC(samplesLeft * sizeof(float));
-	for (; samplesLeft; samplesLeft -= samplesToRead) {
+	for ( ; samplesLeft; samplesLeft -= samplesToRead) {
 		short sampleBuffer[1024], * in = sampleBuffer;;
 		samplesToRead = (samplesLeft > 1024 ? 1024 : samplesLeft);
 		stream->read(stream->data, sampleBuffer, samplesToRead * sizeof(short));
@@ -1022,7 +1022,7 @@ static TSF_BOOL tsf_take(const char** str, const char* what) {
 }
 
 static TSF_BOOL tsf_parse_long(const char** str, long* n) {
-	char* conv_suc = NULL;
+	char* conv_suc = TSF_NULL;
 	char buf[32] = { '\0' };
 	long ret = 0;
 	int i = 0;
@@ -1049,8 +1049,7 @@ static int tsf_get_key(tsf* f, char note, int accidental) {
 	if (note >= 'A' && note <= 'G') note -= 'A';
 	else if (note >= 'a' && note <= 'g') note -= 'a';
 
-	// 48: C2.
-	result = 48 + (f->player->octave - 4) * 12 + offsets[note] + accidental;
+	result = f->player->octave * 12 + offsets[note] + accidental;
 	if (result < 0 || result > 127) result = -1;
 
 	return result;
@@ -1209,10 +1208,12 @@ TSFDEF void tsf_note_on(tsf* f, int preset, int key, float vel) {
 		struct tsf_voice* voice = TSF_NULL; double adjustedPan; TSF_BOOL doLoop; float filterQDB;
 		if (key < region->lokey || key > region->hikey || midiVelocity < region->lovel || midiVelocity > region->hivel) continue;
 
-		if (haveGroupedNotesPlaying && region->group)
-			for (v = f->voices, vEnd = v + f->voiceNum; v != vEnd; v++)
+		if (haveGroupedNotesPlaying && region->group) {
+			for (v = f->voices, vEnd = v + f->voiceNum; v != vEnd; v++) {
 				if (v->playingPreset == preset && v->region->group == region->group)
 					tsf_voice_endquick(v, f->outSampleRate);
+			}
+		}
 
 		for (v = f->voices, vEnd = v + f->voiceNum; v != vEnd; v++) if (v->playingPreset == -1) { voice = v; break; }
 		if (!voice) {
@@ -1268,9 +1269,10 @@ TSFDEF void tsf_note_on(tsf* f, int preset, int key, float vel) {
 
 TSFDEF void tsf_note_off(tsf* f, int preset, int key) {
 	struct tsf_voice* v = f->voices, * vEnd = v + f->voiceNum;
-	for (; v != vEnd; v++)
+	for ( ; v != vEnd; v++) {
 		if (v->playingPreset == preset && v->playingKey == key)
 			tsf_voice_end(v, f->outSampleRate);
+	}
 }
 
 TSFDEF const char* tsf_play(tsf* f, int preset, const char* seq, float vel, void (* delay)(unsigned int)) {
@@ -1448,9 +1450,8 @@ TSFDEF void tsf_play_async(tsf* f, int preset, const char* seq, float vel) {
 }
 
 TSFDEF const char* tsf_play_await(tsf* f, float delta) {
-	if (!f->player || !f->player->asyncSeq) {
+	if (!f->player || !f->player->asyncSeq)
 		return TSF_NULL;
-	}
 
 	f->player->asyncSeq = tsf_play(f, f->player->asyncPreset, f->player->asyncSeq, f->player->asyncVelocity, TSF_NULL);
 	f->player->asyncTicks += delta;
@@ -1488,9 +1489,10 @@ TSFDEF void tsf_render_short(tsf* f, short* buffer, int samples, int flag_mixing
 TSFDEF void tsf_render_float(tsf* f, float* buffer, int samples, int flag_mixing) {
 	struct tsf_voice* v = f->voices, * vEnd = v + f->voiceNum;
 	if (!flag_mixing) TSF_MEMSET(buffer, 0, (f->outputmode == TSF_MONO ? 1 : 2) * sizeof(float) * samples);
-	for (; v != vEnd; v++)
+	for ( ; v != vEnd; v++) {
 		if (v->playingPreset != -1)
 			tsf_voice_render(f, v, buffer, samples);
+	}
 }
 
 #ifdef __cplusplus

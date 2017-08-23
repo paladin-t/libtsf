@@ -27,14 +27,14 @@ tsf_render_short(ptsf, half_second, 22050, 0);
 Play MML synchronously.
 
 ```c++
-tsf_play(ptsf, 0, "ML AA8G8E.D8C2P2 E.D8C<A8G8G2>P2 <G.A8G.A8>C.D8EG A.G8E8D8CD2", sleep);
+tsf_play(ptsf, 0, "ML AA8G8E.D8C2P2 E.D8C<A8G8G2>P2 <G.A8G.A8>C.D8EG A.G8E8D8CD2", 1.0f, sleep);
 ```
 
 Play MML asynchronously.
 
 ```c++
 const char* seq = "ML AA8G8E.D8C2P2 E.D8C<A8G8G2>P2 <G.A8G.A8>C.D8EG A.G8E8D8CD2";
-tsf_play_async(ptsf, 0, seq, 0.2f);
+tsf_play_async(ptsf, 0, seq, 1.0f);
 while (seq && *seq) {
 	seq = tsf_play_await(ptsf, 10.0f / 1000.0f);
 	sleep(10);
@@ -94,7 +94,6 @@ Tn     Sets the number of "L4"s per minute (tempo). Valid values are from 32 to 
 <img src="docs/keys.png" width="480">
 
 ![](docs/notes.gif)
-
 
 ## Dependencies
 
