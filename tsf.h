@@ -1,7 +1,7 @@
 /*
 ** libtfs - A software synthesizer using SoundFont2, and also a player of Music Macro Language.
 **
-** (Copyright (C) 2017 Wang Renxin - https://github.com/paladin-t/libtsf
+** (Copyright (C) 2017 - 2018 Wang Renxin - https://github.com/paladin-t/libtsf
 **   (Based on TinySoundFont, Copyright (C) 2017 Bernhard Schelling - https://github.com/schellingb/TinySoundFont
 **     (Based on SFZero, Copyright (C) 2012 Steve Folta - https://github.com/stevefolta/SFZero)))
 **
@@ -686,7 +686,7 @@ static void tsf_load_samples(float** fontSamples, int* fontSampleCount, struct t
 	samplesLeft = *fontSampleCount = chunkSmpl->size / sizeof(short);
 	out = *fontSamples = (float*)TSF_MALLOC(samplesLeft * sizeof(float));
 	for ( ; samplesLeft; samplesLeft -= samplesToRead) {
-		short sampleBuffer[1024], * in = sampleBuffer;;
+		short sampleBuffer[1024], * in = sampleBuffer;
 		samplesToRead = (samplesLeft > 1024 ? 1024 : samplesLeft);
 		stream->read(stream->data, sampleBuffer, samplesToRead * sizeof(short));
 
@@ -1308,10 +1308,15 @@ TSFDEF const char* tsf_play(tsf* f, int preset, const char* seq, float vel, void
 			float len = (float)f->player->length;
 			float dotted = 1.0f;
 			int acc = 0;
+			char note = *seq++;
 
-			if (*seq == '+' || *seq == '#') { acc = 1; seq = tsf_skip_blank(++seq); } else if (*seq == '-') { acc = -1; seq = tsf_skip_blank(++seq); }
+			if (*seq == '+' || *seq == '#') {
+				acc = 1; seq = tsf_skip_blank(++seq);
+			} else if (*seq == '-') {
+				acc = -1; seq = tsf_skip_blank(++seq);
+			}
 
-			key = tsf_get_key(f, *seq++, acc);
+			key = tsf_get_key(f, note, acc);
 			if (key == -1) break;
 
 			if (*seq == '.') { dotted = 3.0f / 2.0f; seq = tsf_skip_blank(++seq); }
@@ -1359,7 +1364,7 @@ TSFDEF const char* tsf_play(tsf* f, int preset, const char* seq, float vel, void
 			if (n < 0 || n > 6)
 				break;
 
-			f->player->octave = n;
+			f->player->octave = (int)n;
 
 			++seq;
 		} else if (*seq == 'N' || *seq == 'n') {
