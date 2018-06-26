@@ -71,7 +71,7 @@ extern "C" {
 
 // The load functions will return a pointer to a struct tsf which all functions
 // thereafter take as the first parameter.
-// On error the tsf_load* functions will return NULL most likely due to invalid
+// On error the tsf_load* functions will return TSF_NULL most likely due to invalid
 // data (or if the file did not exist in tsf_load_filename).
 typedef struct tsf tsf;
 
@@ -160,7 +160,7 @@ TSFDEF void tsf_play_async(tsf* f, int preset, const char* seq, float vel);
 // Update a music sequence. Call this repeatedly with a asynchronous sequence
 // played by tsf_play_async.
 //   delta: elapsed time in seconds since last call to this function
-// Returns current playing location.
+// Returns current playing location, TSF_NULL for end of sequence.
 TSFDEF const char* tsf_play_await(tsf* f, float delta);
 
 // Render output samples into a buffer.
@@ -1462,6 +1462,8 @@ TSFDEF const char* tsf_play_await(tsf* f, float delta) {
 
 	f->player->asyncSeq = tsf_play(f, f->player->asyncPreset, f->player->asyncSeq, f->player->asyncVelocity, TSF_NULL);
 	f->player->asyncTicks += delta;
+	if (f->player->asyncKey == -1 && f->player->asyncDuration == 0.0f && f->player->asyncDelay == 0.0f)
+		f->player->asyncSeq = TSF_NULL;
 
 	return f->player->asyncSeq;
 }

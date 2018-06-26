@@ -1,0 +1,16 @@
+/.vs
+/Debug
+/Release
+/x64/Debug
+/x64/Release
+*.db
+*.DS_Store
+*.idb
+*.ilk
+*.iobj
+*.ipdb
+*.log
+*.obj
+*.pdb
+*.suo
+*.tlog
