@@ -1,6 +1,6 @@
 # libtfs
 
-Copyright (C) 2017 Wang Renxin - https://github.com/paladin-t/libtsf
+Copyright (C) 2017 - 2018 Tony Wang - https://github.com/paladin-t/libtsf
 
 * Based on TinySoundFont, Copyright (C) 2017 Bernhard Schelling - https://github.com/schellingb/TinySoundFont
 	* Based on SFZero, Copyright (C) 2012 Steve Folta - https://github.com/stevefolta/SFZero
